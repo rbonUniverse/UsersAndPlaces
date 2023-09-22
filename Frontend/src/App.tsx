@@ -1,5 +1,11 @@
 import React from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import MainNavigation from "./shared/components/Navigation/MainNavigation/MainNavigation";
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+} from "react-router-dom";
 import NewPlace from "./places/pages/NewPlace";
 import Users from "./user/pages/Users";
 import "./App.css";
@@ -8,8 +14,14 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <Router>
-          <Route path="/" exact component={Users} />
-          <Route path="/places/new" exact component={NewPlace} />
+        <MainNavigation />
+        <main>
+          <Switch>
+            <Route path="/" exact component={Users} />
+            <Route path="/places/new" exact component={NewPlace} />
+            <Redirect to="/" />
+          </Switch>
+        </main>
       </Router>
     </div>
   );
