@@ -17,11 +17,9 @@ const UsersList: React.FC<UsersProps> = (props) => {
     <div className="UsersList">
       {props.userItems.length === 0 ? (
         <div className="Center">
-          {
-            <Card>
-              <h2>No users found</h2>
-            </Card>
-          }
+          <Card>
+            <h2>No users found</h2>
+          </Card>
         </div>
       ) : (
         <ul className="UsersList-ul">

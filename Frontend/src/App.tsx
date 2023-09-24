@@ -9,6 +9,7 @@ import {
 import NewPlace from "./places/pages/NewPlace";
 import Users from "./user/pages/Users";
 import "./App.css";
+import UserPlaces from "./places/pages/UserPlaces";
 
 const App: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ const App: React.FC = () => {
         <main>
           <Switch>
             <Route path="/" exact component={Users} />
+            <Route path="/:_id/places" exact component={UserPlaces} />
             <Route path="/places/new" exact component={NewPlace} />
             <Redirect to="/" />
           </Switch>
