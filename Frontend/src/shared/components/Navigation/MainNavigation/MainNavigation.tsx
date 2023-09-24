@@ -18,13 +18,11 @@ const MainNavigation: React.FC = (props) => {
   return (
     <div className="MainNavigation">
       {drawerIsOpen && <Backdrop onClick={closeDrawerHandler} />}
-      {drawerIsOpen && (
-        <SideDrawer>
+        <SideDrawer show={drawerIsOpen} onClick={closeDrawerHandler}>
           <nav className="main-navigation__drawer-nav">
             <NavLinks />
           </nav>
         </SideDrawer>
-      )}
       <MainHeader>
         <button className="main-navigation__menu-btn" onClick={openDrawerHandler}>
           <span />

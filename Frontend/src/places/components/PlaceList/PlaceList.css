@@ -1,0 +1,9 @@
+.place-list-results,
+.place-list-center {
+  list-style: none;
+  text-align: center;
+  margin: 1rem auto;
+  padding: 0;
+  width: 90%;
+  max-width: 40rem;
+}
