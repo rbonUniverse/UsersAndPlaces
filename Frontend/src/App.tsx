@@ -6,10 +6,10 @@ import {
   Route,
   Switch,
 } from "react-router-dom";
-import NewPlace from "./places/pages/NewPlace";
+import NewPlace from "./places/pages/NewPlace/NewPlace";
 import Users from "./user/pages/Users";
 import "./App.css";
-import UserPlaces from "./places/pages/UserPlaces";
+import UserPlaces from "./places/pages/UserPlaces/UserPlaces";
 
 const App: React.FC = () => {
   return (

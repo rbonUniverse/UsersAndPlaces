@@ -17,7 +17,7 @@ const UserItem: React.FC<ItemProps> = (props) => {
   return (
     <div className="UserItem">
       {props.userItems.map((user) => (
-        <li className="userItem-li">
+        <li className="userItem-li" key={user._id}>
           <Card className="user-item__content">
             <Link to={`/${user._id}/places`}>
               <div className="user-item__image">
