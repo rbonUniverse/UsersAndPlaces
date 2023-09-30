@@ -26,8 +26,8 @@ const DUMMY_PLACES: {
   },
   {
     _id: "p2",
-    creatorId: "u2",
-    title: "Empire State Building",
+    creatorId: "u1",
+    title: "Romania",
     description: "One of the most famous sky scrapers in the wold",
     image:
       "https://www.esbnyc.com/sites/default/files/styles/small_feature/public/2019-10/home_banner-min.jpg?itok=uZt-03Vw",
@@ -40,12 +40,14 @@ const DUMMY_PLACES: {
 ];
 
 interface RouteParams {
-  _id: string;
+  userId: string;
 }
 
 const UserPlaces: React.FC = () => {
-  const { _id } = useParams<RouteParams>();
-  const loadedPlaces = DUMMY_PLACES.filter((place) => place.creatorId === _id);
+  const { userId } = useParams<RouteParams>();
+  const loadedPlaces = DUMMY_PLACES.filter(
+    (place) => place.creatorId === userId
+  );
   return <PlaceList placeItems={loadedPlaces} />;
 };
 export default UserPlaces;

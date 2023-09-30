@@ -10,6 +10,8 @@ interface Validator {
 interface InputProps {
   id?: string;
   label?: string;
+  initialValue?: string;
+  initialIsValid?: boolean;
   element?: "input" | "textarea";
   rows?: number;
   type?: HTMLInputTypeAttribute;
@@ -40,9 +42,9 @@ const inputReducer = (state: any, action: any) => {
 
 const Input: React.FC<InputProps> = (props) => {
   const [inputState, dispatch] = useReducer(inputReducer, {
-    value: "",
-    isValid: false,
+    value: props.initialValue || "",
     isTouched: false,
+    isValid: props.initialIsValid || false,
   });
 
   const { id, onInput } = props;

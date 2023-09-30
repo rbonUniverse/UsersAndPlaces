@@ -23,7 +23,7 @@ const PlaceList: React.FC<UsersProps> = (props) => {
         <div className="place-list-center">
           <Card>
             <h2>No Places Found, Maybe Create One ?</h2>
-            <Button>Share Place</Button>
+            <Button to="/places/new">Share Place</Button>
           </Card>
         </div>
       ) : (
