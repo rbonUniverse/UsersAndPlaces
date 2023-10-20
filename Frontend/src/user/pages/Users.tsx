@@ -1,32 +1,36 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import UsersList from "../components/UsersList/UsersList";
-
-const USERS: {
-  _id: string;
-  image: string;
-  name: string;
-  placeCount: number;
-}[] = [
-  {
-    _id: "u1",
-    image:
-      "https://www.bsn.eu/wp-content/uploads/2016/12/user-icon-image-placeholder.jpg",
-    name: "ROBBY ZIGI",
-    placeCount: 3,
-  },
-  {
-    _id: "u3",
-    image:
-      "https://www.bsn.eu/wp-content/uploads/2016/12/user-icon-image-placeholder.jpg",
-    name: "PATRICK",
-    placeCount: 2,
-  },
-];
+import LoadingSpinner from "./../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal/ErrorModal";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 
 const Users: React.FC = () => {
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const [users, setUsers] = useState();
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await sendRequest(
+          "GET",
+          "http://localhost:5001/api/users"
+        );
+        
+        setUsers(response.users);
+      } catch (err: any) {}
+    };
+    fetchUsers();
+  }, [sendRequest]);
+
   return (
     <div className="Users">
-      <UsersList userItems={USERS} />
+      <ErrorModal error={error && error.message} onClear={clearError} />
+      {isLoading && (
+        <div>
+          <LoadingSpinner asOverlay />
+        </div>
+      )}
+      {!isLoading && users && <UsersList usersArray={users} />}
     </div>
   );
 };

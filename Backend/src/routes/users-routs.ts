@@ -1,11 +1,11 @@
 import express from "express";
-import { check, body } from "express-validator";
-import usersControlles from "./../controllers/users-controllers";
+import { check } from "express-validator";
+import usersControllers from "./../controllers/users-controllers";
 
 const router = express.Router();
 
 // Return all users
-router.get("/", usersControlles.getUsers);
+router.get("/", usersControllers.getUsers);
 
 // Post new user
 router.post(
@@ -15,10 +15,10 @@ router.post(
     check("email").normalizeEmail().isEmail(),
     check("password").isLength({ min: 6 }),
   ],
-  usersControlles.signup
+  usersControllers.signup
 );
 
 // Update existing user
-router.post("/login", usersControlles.login);
+router.post("/login", usersControllers.login);
 
 export default router;

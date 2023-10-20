@@ -1,14 +1,21 @@
-import React from "react";
+import React, { useContext } from "react";
+import { useHistory } from "react-router-dom";
 import Input from "../../../shared/components/FormElements/Input/Input";
 import Button from "../../../shared/components/FormElements/Button/Button";
 import {
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
 } from "../../../shared/util/Validators/Validators";
+import { useHttpClient } from "../../../shared/hooks/http-hook";
 import { useForm } from "../../../shared/hooks/form-hook";
+import AuthContext from "../../../shared/components/context/auth-context";
+import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 import "./../PlaceFormCSS/PlaceForm.css";
 
 const NewPlace: React.FC = () => {
+  const auth = useContext(AuthContext);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [formState, inputHandler] = useForm(
     {
       title: {
@@ -27,15 +34,27 @@ const NewPlace: React.FC = () => {
     false
   );
 
-  const placeSubmitHandler: React.FormEventHandler<HTMLFormElement> = (
+  const history = useHistory();
+
+  const placeSubmitHandler: React.FormEventHandler<HTMLFormElement> = async (
     event
   ) => {
     event.preventDefault();
-    console.log(formState.inputs);
+    try {
+      await sendRequest("POST", "http://localhost:5001/api/places", {
+        creatorId: auth.userId,
+        title: formState.inputs.title.value,
+        description: formState.inputs.description.value,
+        address: formState.inputs.address.value,
+      });
+      history.push("/");
+    } catch (error) {}
   };
 
   return (
     <div className="NewPlace">
+      <ErrorModal error={error && error.message} onClear={clearError} />
+      {isLoading && <LoadingSpinner asOverlay />}
       <form className="place-form" onSubmit={placeSubmitHandler}>
         <Input
           id="title"

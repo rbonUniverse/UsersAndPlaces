@@ -4,8 +4,8 @@ import Card from "../../../shared/components/UIElements/Card/Card";
 import PlaceItem from "../PlaceItem/PlaceItem";
 import "./PlaceList.css";
 
-interface UsersProps {
-  placeItems: {
+interface UserPlacesProps {
+  userPlacesArray: {
     _id: string;
     creatorId: string;
     title: string;
@@ -14,12 +14,13 @@ interface UsersProps {
     address: string;
     location: { lat: number; lng: number };
   }[];
+  onDeletePlace(_id: string): any;
 }
 
-const PlaceList: React.FC<UsersProps> = (props) => {
+const PlaceList: React.FC<UserPlacesProps> = (props) => {
   return (
     <div className="PlaceList">
-      {props.placeItems.length === 0 ? (
+      {props.userPlacesArray.length === 0 ? (
         <div className="place-list-center">
           <Card>
             <h2>No Places Found, Maybe Create One ?</h2>
@@ -28,8 +29,9 @@ const PlaceList: React.FC<UsersProps> = (props) => {
         </div>
       ) : (
         <div className="place-list-results">
-          <ul className="place-list"></ul>
-          <PlaceItem {...props} />
+          <ul className="place-list">
+            <PlaceItem {...props} />
+          </ul>
         </div>
       )}
     </div>
