@@ -4,28 +4,28 @@ import React from "react";
 import "./UsersList.css";
 
 interface UsersProps {
-  userItems: {
+  usersArray: {
     _id: string;
     image: string;
     name: string;
-    placeCount: number;
+    places: number[];
   }[];
 }
 
 const UsersList: React.FC<UsersProps> = (props) => {
   return (
     <div className="UsersList">
-      {props.userItems.length === 0 ? (
-        <div className="Center">
+      <div className="Center">
+        {props.usersArray.length === 0 ? (
           <Card>
-            <h2>No users found</h2>
+            <h2>No Users Found</h2>
           </Card>
-        </div>
-      ) : (
-        <ul className="UsersList-ul">
-          <UserItem {...props} />
-        </ul>
-      )}
+        ) : (
+          <ul className="UsersList-ul">
+            <UserItem {...props} />
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

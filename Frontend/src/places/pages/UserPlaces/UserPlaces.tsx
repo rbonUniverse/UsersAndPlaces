@@ -1,43 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import PlaceList from "../../components/PlaceList/PlaceList";
-
-const DUMMY_PLACES: {
-  _id: string;
-  creatorId: string;
-  title: string;
-  description: string;
-  image: string;
-  address: string;
-  location: { lat: number; lng: number };
-}[] = [
-  {
-    _id: "p1",
-    creatorId: "u1",
-    title: "Empire State Building",
-    description: "One of the most famous sky scrapers in the wold",
-    image:
-      "https://www.esbnyc.com/sites/default/files/styles/small_feature/public/2019-10/home_banner-min.jpg?itok=uZt-03Vw",
-    address: "20 W 34th st, New York, NY 10001",
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878584,
-    },
-  },
-  {
-    _id: "p2",
-    creatorId: "u1",
-    title: "Romania",
-    description: "One of the most famous sky scrapers in the wold",
-    image:
-      "https://www.esbnyc.com/sites/default/files/styles/small_feature/public/2019-10/home_banner-min.jpg?itok=uZt-03Vw",
-    address: "20 W 34th st, New York, NY 10001",
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878584,
-    },
-  },
-];
+import { useHttpClient } from "../../../shared/hooks/http-hook";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
+import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
 
 interface RouteParams {
   userId: string;
@@ -45,9 +11,44 @@ interface RouteParams {
 
 const UserPlaces: React.FC = () => {
   const { userId } = useParams<RouteParams>();
-  const loadedPlaces = DUMMY_PLACES.filter(
-    (place) => place.creatorId === userId
+  const [loadedPlaces, setLoadedPlaces] = useState();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+
+  useEffect(() => {
+    const fetchUserPlaces = async () => {
+      try {
+        const responseData = await sendRequest(
+          "GET",
+          `http://localhost:5001/api/places/user/${userId}`
+        );
+        setLoadedPlaces(responseData.places);
+      } catch (err: any) {}
+    };
+    fetchUserPlaces();
+  }, [sendRequest, userId]);
+
+  const placeDeletedHandler = (place_idToDelete: string) => {
+    setLoadedPlaces((prevPlaces: any) => {
+      return prevPlaces.filter((place: any) => place._id !== place_idToDelete);
+    });
+  };
+
+  return (
+    <>
+      <ErrorModal error={error && error.message} onClear={clearError} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner asOverlay />
+        </div>
+      )}
+      {!isLoading && loadedPlaces && (
+        <PlaceList
+          userPlacesArray={loadedPlaces}
+          onDeletePlace={placeDeletedHandler}
+        />
+      )}
+      ;
+    </>
   );
-  return <PlaceList placeItems={loadedPlaces} />;
 };
 export default UserPlaces;

@@ -4,10 +4,13 @@ import Button from "../../../shared/components/FormElements/Button/Button";
 import Map from "../../../shared/components/UIElements/Map/Map";
 import Modal from "../../../shared/components/UIElements/Modal/Modal";
 import AuthContext from "./../../../shared/components/context/auth-context";
+import { useHttpClient } from "../../../shared/hooks/http-hook";
+import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 import "./PlaceItem.css";
 
 interface PlaceItemProps {
-  placeItems: {
+  userPlacesArray: {
     _id: string;
     creatorId: string;
     title: string;
@@ -16,12 +19,18 @@ interface PlaceItemProps {
     address: string;
     location: { lat: number; lng: number };
   }[];
+  onDeletePlace(_id: string): any;
 }
 
 const PlaceItem: React.FC<PlaceItemProps> = (props) => {
-  const [showMap, setShowMap] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showMap, setShowMap] = useState<boolean>(false);
+  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const auth = useContext(AuthContext);
+
+  const showButtonsToCreator = props.userPlacesArray.find(
+    (creator) => creator.creatorId === auth.userId
+  );
 
   const openMapHandler = () => {
     setShowMap(true);
@@ -38,14 +47,20 @@ const PlaceItem: React.FC<PlaceItemProps> = (props) => {
     setShowConfirmModal(false);
   };
 
-  const confirmDeleteHandler = () => {
+  const confirmDeleteHandler = async () => {
     setShowConfirmModal(false);
-    console.log("DELETING...");
+    const place = props.userPlacesArray.find((pId) => pId._id);
+    const _id = place._id;
+    try {
+      await sendRequest("DELETE", `http://localhost:5001/api/places/${_id}`);
+      props.onDeletePlace(_id);
+    } catch (err: any) {}
   };
 
   return (
     <>
-      {props.placeItems.map((item) => (
+      <ErrorModal error={error && error.message} onClear={clearError} />
+      {props.userPlacesArray.map((item) => (
         <div className="PlaceItem" key={item._id}>
           <Modal
             show={showMap}
@@ -82,6 +97,7 @@ const PlaceItem: React.FC<PlaceItemProps> = (props) => {
           </Modal>
           <li className="place-item">
             <Card className="place-item__content">
+              {isLoading && <LoadingSpinner asOverlay />}
               <div className="place-item__image">
                 <img src={item.image} alt={item.title} />
               </div>
@@ -94,10 +110,10 @@ const PlaceItem: React.FC<PlaceItemProps> = (props) => {
                 <Button inverse onClick={openMapHandler}>
                   VIEW ON MAP
                 </Button>
-                {auth.isLoggedIn && (
+                {showButtonsToCreator && (
                   <Button to={`/places/${item._id}`}>EDIT</Button>
                 )}
-                {auth.isLoggedIn && (
+                {showButtonsToCreator && (
                   <Button danger onClick={showDeleteWarningHandler}>
                     DELETE
                   </Button>

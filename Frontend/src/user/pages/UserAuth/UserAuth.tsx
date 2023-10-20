@@ -8,12 +8,16 @@ import {
   VALIDATOR_REQUIRE,
 } from "../../../shared/util/Validators/Validators";
 import Card from "../../../shared/components/UIElements/Card/Card";
-import AuthContext from "./../../../shared/components/context/auth-context";
+import AuthContext from "../../../shared/components/context/auth-context";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
+import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
+import { useHttpClient } from "../../../shared/hooks/http-hook";
 import "./UserAuth.css";
 
 const UserAuth: React.FC = () => {
-    const auth = useContext(AuthContext);
-  const [isLoginMode, setIsLoginMode] = useState(true);
+  const auth = useContext(AuthContext);
+  const [isLoginMode, setIsLoginMode] = useState<boolean>(true);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [formState, authInputHandler, setFormData] = useForm(
     {
       email: {
@@ -49,15 +53,50 @@ const UserAuth: React.FC = () => {
     setIsLoginMode((prevMode) => !prevMode);
   };
 
-  const authLoginHandler: React.FormEventHandler<HTMLFormElement> = (event) => {
+  const authLoginHandler: React.FormEventHandler<HTMLFormElement> = async (
+    event
+  ) => {
     event.preventDefault();
-    console.log(formState.inputs);
-    auth.login();
+
+    if (isLoginMode) {
+      try {
+        const responseData = await sendRequest(
+          "POST",
+          "http://localhost:5001/api/users/login",
+          {
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }
+        );
+
+        auth.login(responseData.user._id);
+      } catch (err: any) {}
+    } else {
+      try {
+        const responseData = await sendRequest(
+          "POST",
+          "http://localhost:5001/api/users/signup",
+          {
+            name: formState.inputs.name.value,
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }
+        );
+
+        auth.login(responseData.user._id);
+      } catch (err: any) {}
+    }
   };
 
   return (
     <div className="UserAuth">
+      <ErrorModal error={error && error.message} onClear={clearError} />
       <Card className="authentication">
+        {isLoading && (
+          <div className="center">
+            <LoadingSpinner asOverlay />
+          </div>
+        )}
         <h2>Login Required</h2>
         <hr />
         <form onSubmit={authLoginHandler}>
@@ -87,7 +126,7 @@ const UserAuth: React.FC = () => {
             type="password"
             label="Password"
             validators={[VALIDATOR_MIN(6)]}
-            errorText="Please enter a valid password"
+            errorText="Please enter a valid password, at list 6 characters"
             onInput={authInputHandler}
           />
           <Button type="submit" disabled={!formState.isValid}>

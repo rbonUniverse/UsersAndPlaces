@@ -1,16 +1,19 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, { NextFunction, Request, response, Response } from "express";
 import placesRoutes from "./src/routes/places-routes";
 import usersRoutes from "./src/routes/users-routs";
 import HTTPError from "./src/models/http-error";
 import bodyParser from "body-parser";
 import config from "./util/config";
 import mongoose from "mongoose";
+import cors from "cors";
 
 interface CustomError extends Error {
   code?: number;
 }
 
 const app = express();
+
+app.use(cors());
 
 app.use(bodyParser.json());
 

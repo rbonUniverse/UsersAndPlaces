@@ -1,20 +1,20 @@
 import express from "express";
 import { check } from "express-validator";
-import placesControlles from "./../controllers/places-controller";
+import placesControllers from "./../controllers/places-controller";
 
 const router = express.Router();
 
 // Return specific place
-router.get("/:_id", placesControlles.getPlaceById);
+router.get("/:_id", placesControllers.getPlaceById);
 
-// Return all user by places
-router.get("/user/:_id", placesControlles.getPlacesByUserId);
+// Return all places by user
+router.get("/user/:_id", placesControllers.getPlacesByUserId);
 
 // Post new place
 router.post(
   "/",
   [check("title").notEmpty(), check("description").isLength({ min: 5 })],
-  placesControlles.createPlace
+  placesControllers.createPlace
 );
 
 // Update existing place
@@ -25,10 +25,10 @@ router.patch(
     check("description").isLength({ min: 5 }),
     check("description").notEmpty(),
   ],
-  placesControlles.updatePlace
+  placesControllers.updatePlace
 );
 
 // Delete place
-router.delete("/:_id", placesControlles.deletePlace);
+router.delete("/:_id", placesControllers.deletePlace);
 
 export default router;
