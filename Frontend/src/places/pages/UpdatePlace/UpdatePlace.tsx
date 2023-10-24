@@ -23,8 +23,15 @@ interface Place {
   description: string;
 }
 
+interface authContextInterface {
+  isLoggedIn: boolean;
+  userId: string;
+  login: (userId: string) => void;
+  logout: () => void;
+}
+
 const UpdatePlace: React.FC = () => {
-  const auth = useContext(AuthContext);
+  const auth = useContext<authContextInterface>(AuthContext);
   const [placeToUpdate, setPlaceToUpdate] = useState<Place>();
   const { error, isLoading, sendRequest, clearError } = useHttpClient();
   const { placeId } = useParams<RouteParams>();
@@ -112,7 +119,7 @@ const UpdatePlace: React.FC = () => {
       {!isLoading && placeToUpdate && (
         <form className="place-form" onSubmit={placeUpdateSubmitHandler}>
           <Input
-            id="title"
+            _id="title"
             element="input"
             type="text"
             label="Title"
@@ -123,7 +130,7 @@ const UpdatePlace: React.FC = () => {
             initialIsValid={true}
           />
           <Input
-            id="description"
+            _id="description"
             element="textarea"
             label="Description"
             validators={[VALIDATOR_MINLENGTH(5)]}

@@ -2,6 +2,20 @@ import HTTPError from "../models/http-error";
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { IUserModel, UserModel } from "../models/userModel";
+import { IPlaceModel } from "../models/placeModel";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+
+interface UserFieldsInterface {
+  name: string;
+  email: string;
+  image: Request;
+  password: string;
+  places: IPlaceModel[];
+}
+
+let token: string;
+const secretKey = "ururt_sfdsfsfdsf_";
 
 // GET Places by user
 const getUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -28,7 +42,7 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
     );
   }
 
-  const { name, email, password } = req.body;
+  const { name, email, password }: UserFieldsInterface = req.body;
 
   let existingUser: IUserModel | null;
   try {
@@ -49,12 +63,19 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
     return next(error);
   }
 
-  const createdUser = new UserModel({
+  let hashedPassword: string;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err: any) {
+    const error = new HTTPError("Could not create user, please try again", 500);
+    return next(error);
+  }
+
+  const createdUser: IUserModel = new UserModel({
     name,
     email,
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Pierre-Person.jpg/1200px-Pierre-Person.jpg",
-    password,
+    image: req.file?.path,
+    password: hashedPassword,
     places: [],
   });
 
@@ -68,12 +89,28 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
     return next(error);
   }
 
-  res.status(201).json({ user: createdUser.toObject() });
+  try {
+    token = jwt.sign(
+      { userId: createdUser.id, email: createdUser.email },
+      secretKey,
+      { expiresIn: "1h" }
+    );
+  } catch (err: any) {
+    const error = new HTTPError(
+      "Signing up failed, please try again later",
+      500
+    );
+    return next(error);
+  }
+
+  res
+    .status(201)
+    .json({ userId: createdUser.id, email: createdUser.email, token: token });
 };
 
 // POST User
 const login = async (req: Request, res: Response, next: NextFunction) => {
-  const { email, password } = req.body;
+  const { email, password }: UserFieldsInterface = req.body;
 
   let existingUser: IUserModel | null;
   try {
@@ -82,13 +119,51 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     const error = new HTTPError("Logging failed, please try again later", 500);
     return next(error);
   }
-  if (!existingUser || existingUser.password !== password) {
+
+  if (!existingUser) {
     return next(
       new HTTPError("Invalid credentials, could not log you in", 401)
     );
   }
 
-  res.json({ message: "Logged in", user: existingUser.toObject() });
+  let isValidPassword: boolean = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
+    const error = new HTTPError(
+      "Could not log you in, please check your credentials and try again.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!isValidPassword) {
+    const error = new HTTPError(
+      "Invalid credentials, could not log you in",
+      401
+    );
+    return next(error);
+  }
+
+  try {
+    token = jwt.sign(
+      { userId: existingUser.id, email: existingUser.email },
+      secretKey,
+      { expiresIn: "1h" }
+    );
+  } catch (err: any) {
+    const error = new HTTPError(
+      "Logging in failed, please try again later",
+      500
+    );
+    return next(error);
+  }
+
+  res.json({
+    userId: existingUser.id,
+    email: existingUser.email,
+    token: token,
+  });
 };
 
 export default {

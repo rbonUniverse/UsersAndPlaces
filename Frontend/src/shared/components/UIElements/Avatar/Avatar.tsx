@@ -9,7 +9,7 @@ interface AvatarProps {
 const Avatar: React.FC<AvatarProps> = (props) => {
   return (
     <div className="Avatar">
-      <img src={props.image} alt={props.name} />
+      <img src={`http://localhost:5001/${props.image}`} alt={props.name} />
     </div>
   );
 };

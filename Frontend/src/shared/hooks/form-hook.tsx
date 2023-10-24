@@ -46,6 +46,7 @@ export const useForm = (
     lastName?: InputField;
     email?: InputField;
     password?: InputField;
+    image?: InputField;
   },
   initialFormValidity: boolean
 ) => {

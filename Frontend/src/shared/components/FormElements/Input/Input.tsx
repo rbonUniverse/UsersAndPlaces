@@ -8,7 +8,7 @@ interface Validator {
 }
 
 interface InputProps {
-  id?: string;
+  _id?: string;
   label?: string;
   initialValue?: string;
   initialIsValid?: boolean;
@@ -18,7 +18,7 @@ interface InputProps {
   placeholder?: string;
   errorText?: string;
   validators?: Validator[];
-  onInput?: (id: string | undefined, value: string, isValid: boolean) => void;
+  onInput?: (_id: string | undefined, value: string, isValid: boolean) => void;
 }
 
 const inputReducer = (state: any, action: any) => {
@@ -47,12 +47,12 @@ const Input: React.FC<InputProps> = (props) => {
     isValid: props.initialIsValid || false,
   });
 
-  const { id, onInput } = props;
+  const { _id, onInput } = props;
   const { value, isValid } = inputState;
 
   useEffect(() => {
-    onInput(id, value, isValid);
-  }, [id, value, isValid, onInput]);
+    onInput(_id, value, isValid);
+  }, [_id, value, isValid, onInput]);
 
   const changeHandler: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
@@ -73,7 +73,7 @@ const Input: React.FC<InputProps> = (props) => {
   const element =
     props.element === "input" ? (
       <input
-        id={props.id}
+        id={props._id}
         type={props.type}
         placeholder={props.placeholder}
         onChange={changeHandler}
@@ -82,7 +82,7 @@ const Input: React.FC<InputProps> = (props) => {
       />
     ) : (
       <textarea
-        id={props.id}
+        id={props._id}
         rows={props.rows || 3}
         onChange={changeHandler}
         onBlur={touchHandler}
@@ -96,7 +96,7 @@ const Input: React.FC<InputProps> = (props) => {
         !inputState.isValid && inputState.isTouched && "form-control--invalid"
       }`}
     >
-      <label htmlFor={props.id}>{props.label}</label>
+      <label htmlFor={props._id}>{props.label}</label>
       {element}
       {!inputState.isValid && inputState.isTouched && <p>{props.errorText}</p>}
     </div>
