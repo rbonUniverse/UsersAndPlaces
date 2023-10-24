@@ -3,7 +3,7 @@ import axios, { AxiosError } from "axios";
 
 export const useHttpClient = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<any>(null);
 
   const activeHttpRequests = useRef<AbortController[]>([]);
 
@@ -12,7 +12,13 @@ export const useHttpClient = () => {
       method: "GET" | "POST" | "PATCH" | "DELETE",
       url: string,
       body?:
-        | { name?: string; email: string; password: string }
+        | {
+            name?: string;
+            email?: string;
+            password?: string;
+            formData?: File;
+            append?(): any;
+          }
         | {
             creatorId?: string;
             title: string;

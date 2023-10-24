@@ -99,7 +99,10 @@ const PlaceItem: React.FC<PlaceItemProps> = (props) => {
             <Card className="place-item__content">
               {isLoading && <LoadingSpinner asOverlay />}
               <div className="place-item__image">
-                <img src={item.image} alt={item.title} />
+                <img
+                  src={`http://localhost:5001/${item.image}`}
+                  alt={item.title}
+                />
               </div>
               <div className="place-item__info">
                 <h2>{item.title}</h2>

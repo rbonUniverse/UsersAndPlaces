@@ -12,10 +12,22 @@ import AuthContext from "../../../shared/components/context/auth-context";
 import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
 import { useHttpClient } from "../../../shared/hooks/http-hook";
+import ImageUpload from "../../../shared/components/FormElements/ImageUpload/ImageUpload";
 import "./UserAuth.css";
 
-const UserAuth: React.FC = () => {
-  const auth = useContext(AuthContext);
+interface authContextInterface {
+  isLoggedIn: boolean;
+  userId: string;
+  login: (userId: string) => void;
+  logout: () => void;
+}
+
+interface FormDataInterface {
+  append?(name?: string, email?: string, password?: string, image?: File): any;
+}
+
+const UserAuth: React.FC<FormDataInterface> = () => {
+  const auth: authContextInterface = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState<boolean>(true);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [formState, authInputHandler, setFormData] = useForm(
@@ -35,7 +47,7 @@ const UserAuth: React.FC = () => {
   const switchModeHandler = () => {
     if (!isLoginMode) {
       setFormData(
-        { ...formState.inputs, name: undefined },
+        { ...formState.inputs, name: undefined, image: undefined },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
     } else {
@@ -44,6 +56,10 @@ const UserAuth: React.FC = () => {
           ...formState.inputs,
           name: {
             value: "",
+            isValid: false,
+          },
+          image: {
+            value: null,
             isValid: false,
           },
         },
@@ -73,14 +89,15 @@ const UserAuth: React.FC = () => {
       } catch (err: any) {}
     } else {
       try {
+        const formData: FormDataInterface = new FormData();
+        formData.append("name", formState.inputs.name.value);
+        formData.append("email", formState.inputs.email.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("image", formState.inputs.image.value);
         const responseData = await sendRequest(
           "POST",
           "http://localhost:5001/api/users/signup",
-          {
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }
+          formData
         );
 
         auth.login(responseData.user._id);
@@ -102,7 +119,7 @@ const UserAuth: React.FC = () => {
         <form onSubmit={authLoginHandler}>
           {!isLoginMode && (
             <Input
-              id="name"
+              _id="name"
               element="input"
               type="text"
               label="Your Name"
@@ -111,8 +128,17 @@ const UserAuth: React.FC = () => {
               onInput={authInputHandler}
             />
           )}
+          {!isLoginMode && (
+            <ImageUpload
+              _id="image"
+              center
+              error
+              errorText="Please provide an image"
+              onInput={authInputHandler}
+            />
+          )}
           <Input
-            id="email"
+            _id="email"
             element="input"
             type="email"
             label="E-Mail"
@@ -121,7 +147,7 @@ const UserAuth: React.FC = () => {
             onInput={authInputHandler}
           />
           <Input
-            id="password"
+            _id="password"
             element="input"
             type="password"
             label="Password"

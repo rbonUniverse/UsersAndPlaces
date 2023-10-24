@@ -12,9 +12,27 @@ import AuthContext from "../../../shared/components/context/auth-context";
 import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
 import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 import "./../PlaceFormCSS/PlaceForm.css";
+import ImageUpload from "../../../shared/components/FormElements/ImageUpload/ImageUpload";
+
+interface AuthContextInterface {
+  isLoggedIn: boolean;
+  userId: string;
+  login: (userId: string) => void;
+  logout: () => void;
+}
+
+interface FormDataInterface {
+  append(
+    creatorId?: string,
+    title?: string,
+    description?: string,
+    address?: string,
+    image?: File
+  ): any;
+}
 
 const NewPlace: React.FC = () => {
-  const auth = useContext(AuthContext);
+  const auth = useContext<AuthContextInterface>(AuthContext);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [formState, inputHandler] = useForm(
     {
@@ -30,6 +48,10 @@ const NewPlace: React.FC = () => {
         value: "",
         isValid: false,
       },
+      image: {
+        value: null,
+        isValid: false,
+      },
     },
     false
   );
@@ -41,12 +63,13 @@ const NewPlace: React.FC = () => {
   ) => {
     event.preventDefault();
     try {
-      await sendRequest("POST", "http://localhost:5001/api/places", {
-        creatorId: auth.userId,
-        title: formState.inputs.title.value,
-        description: formState.inputs.description.value,
-        address: formState.inputs.address.value,
-      });
+      const formData: FormDataInterface = new FormData();
+      formData.append("creatorId", auth.userId);
+      formData.append("title", formState.inputs.title.value);
+      formData.append("description", formState.inputs.description.value);
+      formData.append("address", formState.inputs.address.value);
+      formData.append("image", formState.inputs.image.value);
+      await sendRequest("POST", "http://localhost:5001/api/places", formData);
       history.push("/");
     } catch (error) {}
   };
@@ -57,7 +80,7 @@ const NewPlace: React.FC = () => {
       {isLoading && <LoadingSpinner asOverlay />}
       <form className="place-form" onSubmit={placeSubmitHandler}>
         <Input
-          id="title"
+          _id="title"
           element="input"
           type="text"
           label="Title"
@@ -66,7 +89,7 @@ const NewPlace: React.FC = () => {
           onInput={inputHandler}
         />
         <Input
-          id="description"
+          _id="description"
           element="textarea"
           label="Description"
           validators={[VALIDATOR_MINLENGTH(5)]}
@@ -74,11 +97,18 @@ const NewPlace: React.FC = () => {
           onInput={inputHandler}
         />
         <Input
-          id="address"
+          _id="address"
           element="input"
           label="Address"
           validators={[VALIDATOR_REQUIRE()]}
           errorText="Please enter a valid address."
+          onInput={inputHandler}
+        />
+        <ImageUpload
+          _id="image"
+          center
+          error
+          errorText="Please provide an image"
           onInput={inputHandler}
         />
         <Button type="submit" disabled={!formState.isValid}>

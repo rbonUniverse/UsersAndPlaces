@@ -5,6 +5,8 @@ import HTTPError from "./src/models/http-error";
 import bodyParser from "body-parser";
 import config from "./util/config";
 import mongoose from "mongoose";
+import path from "path";
+import fs from "fs";
 import cors from "cors";
 
 interface CustomError extends Error {
@@ -17,6 +19,8 @@ app.use(cors());
 
 app.use(bodyParser.json());
 
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
+
 app.use("/api/places", placesRoutes);
 
 app.use("/api/users", usersRoutes);
@@ -28,6 +32,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use(
   (error: CustomError, req: Request, res: Response, next: NextFunction) => {
+    if (req.file) {
+      fs.unlink(req.file.path, (err) => {
+        console.log(err);
+      });
+    }
     if (res.headersSent) {
       return next(error);
     }

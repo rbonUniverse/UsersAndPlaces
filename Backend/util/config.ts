@@ -4,7 +4,7 @@ class Config {
 
   constructor() {
     this.connectionString =
-      "mongodb+srv://<USERNAME>:<PASSWORD>@cluster0.fqvbapr.mongodb.net/UsersAndPlaces?retryWrites=true&w=majority";
+      "mongodb+srv://robbyzigi:HDW1cQUSuIWzJRqz@cluster0.fqvbapr.mongodb.net/UsersAndPlaces?retryWrites=true&w=majority";
     this.port = 5001;
   }
 }

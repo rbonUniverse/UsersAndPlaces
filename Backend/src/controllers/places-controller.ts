@@ -1,10 +1,19 @@
 import HTTPError from "../models/http-error";
+import fs from "fs";
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 import getCoordinatesForAddress from "../../util/location";
-import { PlaceModel, IPlaceModel, placeSchema } from "../models/placeModel";
+import { IPlaceModel, PlaceModel } from "../models/placeModel";
 import { IUserModel, UserModel } from "../models/userModel";
 import mongoose from "mongoose";
+
+interface PlaceFieldsInterface {
+  creatorId?: string;
+  title: string;
+  description: string;
+  address: string;
+  image: Request;
+}
 
 // GET place by _id
 const getPlaceById = async (
@@ -12,7 +21,7 @@ const getPlaceById = async (
   res: Response,
   next: NextFunction
 ) => {
-  const placeId = req.params._id;
+  const placeId: string = req.params._id;
 
   let place: IPlaceModel | null;
   try {
@@ -41,7 +50,7 @@ const getPlacesByUserId = async (
   res: Response,
   next: NextFunction
 ) => {
-  const userId = req.params._id;
+  const userId: string = req.params._id;
 
   let userPlaces: IPlaceModel[];
   try {
@@ -74,7 +83,8 @@ const createPlace = async (req: Request, res: Response, next: NextFunction) => {
       new HTTPError("Invalid inputs passed, please check your data", 422)
     );
   }
-  const { creatorId, title, description, address } = req.body;
+  const { creatorId, title, description, address }: PlaceFieldsInterface =
+    req.body;
 
   let coordinates: { lat: number; lng: number };
   try {
@@ -83,17 +93,16 @@ const createPlace = async (req: Request, res: Response, next: NextFunction) => {
     return next(error);
   }
 
-  const createdPlace = new PlaceModel({
+  const createdPlace: IPlaceModel = new PlaceModel({
     creatorId,
     title,
     description,
     address,
     location: coordinates,
-    image: "https://media.timeout.com/images/101705309/image.jpg",
+    image: req.file?.path,
   });
 
   let user: IUserModel | null;
-
   try {
     user = await UserModel.findById(creatorId);
   } catch (err) {
@@ -117,10 +126,7 @@ const createPlace = async (req: Request, res: Response, next: NextFunction) => {
     await user.save({ session });
     await session.commitTransaction();
   } catch (err) {
-    const error = new HTTPError(
-      "Could not creating place failed, please try again",
-      500
-    );
+    const error = new HTTPError("Creating place failed, please try again", 500);
     return next(error);
   }
 
@@ -135,8 +141,8 @@ const updatePlace = async (req: Request, res: Response, next: NextFunction) => {
       new HTTPError("Invalid inputs passed, please check your data", 422)
     );
   }
-  const placeId = req.params._id;
-  const { title, description } = req.body;
+  const placeId: string = req.params._id;
+  const { title, description }: PlaceFieldsInterface = req.body;
 
   let place: IPlaceModel | null;
   try {
@@ -161,18 +167,27 @@ const updatePlace = async (req: Request, res: Response, next: NextFunction) => {
 
 // DELETE Place
 const deletePlace = async (req: Request, res: Response, next: NextFunction) => {
-  const placeId = req.params._id;
+  const placeId: string = req.params._id;
 
   let place: IPlaceModel | null;
-
   try {
     place = await PlaceModel.findById(placeId);
+  } catch (err) {
+    const error = new HTTPError(
+      "Something went wrong, could not delete place.",
+      500
+    );
+    return next(error);
+  }
 
-    if (!place) {
-      const error = new HTTPError("Could not find place for this _id", 404);
-      return next(error);
-    }
+  if (!place) {
+    const error = new HTTPError("Could not find place for this _id", 404);
+    return next(error);
+  }
 
+  const imagePath = place.image;
+
+  try {
     const session = await mongoose.startSession();
     session.startTransaction();
     await place?.deleteOne({ session });
@@ -195,6 +210,10 @@ const deletePlace = async (req: Request, res: Response, next: NextFunction) => {
     );
     return next(error);
   }
+
+  fs.unlink(imagePath, (err) => {
+    console.log(err);
+  });
 
   res.status(200).json({ message: "Place Deleted" });
 };
