@@ -1,10 +1,10 @@
-  class Config {
+class Config {
   public connectionString: string;
   public port: number;
 
   constructor() {
     this.connectionString =
-      "mongodb+srv://<username>:<password>@cluster0.fqvbapr.mongodb.net/UsersAndPlaces?retryWrites=true&w=majority";
+      "mongodb+srv://<USERNAME>:<PASSWORD>@cluster0.fqvbapr.mongodb.net/UsersAndPlaces?retryWrites=true&w=majority";
     this.port = 5001;
   }
 }
