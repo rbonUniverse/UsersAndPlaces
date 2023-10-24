@@ -6,7 +6,7 @@ interface AddressCoordinates {
   lng: number;
 }
 
-const API_KEY = "YOUR_API_KEY";
+const API_KEY: string = "YOUR_API_KEY";
 
 const getCoordinatesForAddress = async (
   address: string
