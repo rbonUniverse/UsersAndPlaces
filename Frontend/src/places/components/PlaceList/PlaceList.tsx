@@ -5,7 +5,7 @@ import PlaceItem from "../PlaceItem/PlaceItem";
 import "./PlaceList.css";
 
 interface UserPlacesProps {
-  userPlacesArray: {
+  item: {
     _id: string;
     creatorId: string;
     title: string;
@@ -20,7 +20,7 @@ interface UserPlacesProps {
 const PlaceList: React.FC<UserPlacesProps> = (props) => {
   return (
     <div className="PlaceList">
-      {props.userPlacesArray.length === 0 ? (
+      {props.item.length === 0 ? (
         <div className="place-list-center">
           <Card>
             <h2>No Places Found, Maybe Create One ?</h2>
@@ -30,7 +30,13 @@ const PlaceList: React.FC<UserPlacesProps> = (props) => {
       ) : (
         <div className="place-list-results">
           <ul className="place-list">
-            <PlaceItem {...props} />
+            {props.item.map((place) => (
+              <PlaceItem
+                key={place._id}
+                item={place}
+                onDeletePlace={props.onDeletePlace}
+              />
+            ))}
           </ul>
         </div>
       )}

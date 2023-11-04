@@ -1,6 +1,6 @@
-import express, { NextFunction, Request, response, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import placesRoutes from "./src/routes/places-routes";
-import usersRoutes from "./src/routes/users-routs";
+import usersRoutes from "./src/routes/users-routes";
 import HTTPError from "./src/models/http-error";
 import bodyParser from "body-parser";
 import config from "./util/config";
@@ -13,6 +13,10 @@ interface CustomError extends Error {
   code?: number;
 }
 
+interface JwtPayload {
+  userId: string;
+}
+
 const app = express();
 
 app.use(cors());
@@ -20,7 +24,18 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
-
+/////////////////////////////////////////////////////////
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+  
+  next();
+});
+/////////////////////////////////////////////////////////
 app.use("/api/places", placesRoutes);
 
 app.use("/api/users", usersRoutes);

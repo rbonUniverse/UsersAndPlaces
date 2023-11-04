@@ -3,8 +3,7 @@ class Config {
   public port: number;
 
   constructor() {
-    this.connectionString =
-      "mongodb+srv://robbyzigi:HDW1cQUSuIWzJRqz@cluster0.fqvbapr.mongodb.net/UsersAndPlaces?retryWrites=true&w=majority";
+    this.connectionString = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.fqvbapr.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
     this.port = 5001;
   }
 }

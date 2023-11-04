@@ -19,7 +19,7 @@ const UserPlaces: React.FC = () => {
       try {
         const responseData = await sendRequest(
           "GET",
-          `http://localhost:5001/api/places/user/${userId}`
+          `${process.env.REACT_APP_BACKEND_URL}/places/user/${userId}`
         );
         setLoadedPlaces(responseData.places);
       } catch (err: any) {}
@@ -42,12 +42,8 @@ const UserPlaces: React.FC = () => {
         </div>
       )}
       {!isLoading && loadedPlaces && (
-        <PlaceList
-          userPlacesArray={loadedPlaces}
-          onDeletePlace={placeDeletedHandler}
-        />
+        <PlaceList item={loadedPlaces} onDeletePlace={placeDeletedHandler} />
       )}
-      ;
     </>
   );
 };

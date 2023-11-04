@@ -15,7 +15,6 @@ interface UserFieldsInterface {
 }
 
 let token: string;
-const secretKey = "ururt_sfdsfsfdsf_";
 
 // GET Places by user
 const getUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -74,7 +73,7 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
   const createdUser: IUserModel = new UserModel({
     name,
     email,
-    image: req.file?.path,
+    image: (req as any).file?.path,
     password: hashedPassword,
     places: [],
   });
@@ -91,8 +90,8 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     token = jwt.sign(
-      { userId: createdUser.id, email: createdUser.email },
-      secretKey,
+      { userId: createdUser._id, email: createdUser.email },
+      process.env.JWT_KEY as string,
       { expiresIn: "1h" }
     );
   } catch (err: any) {
@@ -105,7 +104,7 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
 
   res
     .status(201)
-    .json({ userId: createdUser.id, email: createdUser.email, token: token });
+    .json({ userId: createdUser._id, email: createdUser.email, token: token });
 };
 
 // POST User
@@ -147,8 +146,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     token = jwt.sign(
-      { userId: existingUser.id, email: existingUser.email },
-      secretKey,
+      { userId: existingUser._id, email: existingUser.email },
+      process.env.JWT_KEY as string,
       { expiresIn: "1h" }
     );
   } catch (err: any) {
@@ -160,7 +159,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   res.json({
-    userId: existingUser.id,
+    userId: existingUser._id,
     email: existingUser.email,
     token: token,
   });

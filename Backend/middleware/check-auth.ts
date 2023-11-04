@@ -2,17 +2,37 @@ import { Request, Response, NextFunction } from "express";
 import HTTPError from "../src/models/http-error";
 import jwt from "jsonwebtoken";
 
-const secretKey = "ururt_sfdsfsfdsf_";
+interface JwtPayload {
+  userId: string;
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      userData: { userId: string };
+    }
+  }
+}
 
 const checkAuth = (req: Request, res: Response, next: NextFunction) => {
+  if (
+    req.method === "POST" ||
+    req.method === "PATCH" ||
+    req.method === "DELETE"
+  ) {
+    return next();
+  }
   try {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
       throw new Error("Authentication failed!");
     }
-    const decodedToken: any = jwt.verify(token, secretKey);
+    const decodedToken = jwt.verify(
+      token,
+      process.env.JWT_KEY as string
+    ) as JwtPayload;
     req.userData = { userId: decodedToken.userId };
-    next();
+    return next(req.userData);
   } catch (err: any) {
     const error = new HTTPError("Authentication failed!", 401);
     next(error);

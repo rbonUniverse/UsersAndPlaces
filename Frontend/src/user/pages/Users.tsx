@@ -13,9 +13,9 @@ const Users: React.FC = () => {
       try {
         const response = await sendRequest(
           "GET",
-          "http://localhost:5001/api/users"
+          `${process.env.REACT_APP_BACKEND_URL}/users`
         );
-        
+
         setUsers(response.users);
       } catch (err: any) {}
     };

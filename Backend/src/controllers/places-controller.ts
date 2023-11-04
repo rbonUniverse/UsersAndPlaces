@@ -1,11 +1,11 @@
 import HTTPError from "../models/http-error";
-import fs from "fs";
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 import getCoordinatesForAddress from "../../util/location";
 import { IPlaceModel, PlaceModel } from "../models/placeModel";
 import { IUserModel, UserModel } from "../models/userModel";
 import mongoose from "mongoose";
+import fs from "fs";
 
 interface PlaceFieldsInterface {
   creatorId?: string;
@@ -99,7 +99,7 @@ const createPlace = async (req: Request, res: Response, next: NextFunction) => {
     description,
     address,
     location: coordinates,
-    image: req.file?.path,
+    image: (req as any).file?.path,
   });
 
   let user: IUserModel | null;
@@ -141,10 +141,17 @@ const updatePlace = async (req: Request, res: Response, next: NextFunction) => {
       new HTTPError("Invalid inputs passed, please check your data", 422)
     );
   }
+
   const placeId: string = req.params._id;
   const { title, description }: PlaceFieldsInterface = req.body;
 
   let place: IPlaceModel | null;
+  place = await PlaceModel.findById(placeId);
+
+  if (place?.creatorId.toString() !== req.userData.userId) {
+    const error = new HTTPError("You are not allowed to edit this place.", 401);
+    return next(error);
+  }
   try {
     place = await PlaceModel.findByIdAndUpdate(
       placeId,

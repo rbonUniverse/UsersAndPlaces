@@ -1,0 +1,9 @@
+{
+  "env": {
+    "DB_USER": "robbyzigi",
+    "DB_PASSWORD": "HDW1cQUSuIWzJRqz",
+    "DB_NAME": "UsersAndPlaces",
+    "GOOGLE_API_KEY": "AIzaSyB-X9ZS86H8NwzLk3h7PQzGQiwMH35oP3g",
+    "JWT_KEY": "ururt_sfdsfsfdsf_"
+  }
+}

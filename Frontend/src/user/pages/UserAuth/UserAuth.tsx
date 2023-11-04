@@ -15,11 +15,14 @@ import { useHttpClient } from "../../../shared/hooks/http-hook";
 import ImageUpload from "../../../shared/components/FormElements/ImageUpload/ImageUpload";
 import "./UserAuth.css";
 
-interface authContextInterface {
-  isLoggedIn: boolean;
+interface AuthContextInterface {
+  token: boolean;
   userId: string;
-  login: (userId: string) => void;
-  logout: () => void;
+  loginAndSignUp?: (
+    userId: string,
+    token: boolean,
+    expirationData: Date
+  ) => void;
 }
 
 interface FormDataInterface {
@@ -27,7 +30,7 @@ interface FormDataInterface {
 }
 
 const UserAuth: React.FC<FormDataInterface> = () => {
-  const auth: authContextInterface = useContext(AuthContext);
+  const auth: AuthContextInterface = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState<boolean>(true);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [formState, authInputHandler, setFormData] = useForm(
@@ -78,14 +81,18 @@ const UserAuth: React.FC<FormDataInterface> = () => {
       try {
         const responseData = await sendRequest(
           "POST",
-          "http://localhost:5001/api/users/login",
+          `${process.env.REACT_APP_BACKEND_URL}/users/login`,
           {
             email: formState.inputs.email.value,
             password: formState.inputs.password.value,
           }
         );
 
-        auth.login(responseData.user._id);
+        auth.loginAndSignUp(
+          responseData.userId,
+          responseData.token,
+          responseData.expirationData
+        );
       } catch (err: any) {}
     } else {
       try {
@@ -96,11 +103,15 @@ const UserAuth: React.FC<FormDataInterface> = () => {
         formData.append("image", formState.inputs.image.value);
         const responseData = await sendRequest(
           "POST",
-          "http://localhost:5001/api/users/signup",
+          `${process.env.REACT_APP_BACKEND_URL}/users/signup`,
           formData
         );
 
-        auth.login(responseData.user._id);
+        auth.loginAndSignUp(
+          responseData.userId,
+          responseData.token,
+          responseData.expirationData
+        );
       } catch (err: any) {}
     }
   };

@@ -23,15 +23,13 @@ interface Place {
   description: string;
 }
 
-interface authContextInterface {
-  isLoggedIn: boolean;
+interface AuthContextInterface {
+  token: boolean;
   userId: string;
-  login: (userId: string) => void;
-  logout: () => void;
 }
 
 const UpdatePlace: React.FC = () => {
-  const auth = useContext<authContextInterface>(AuthContext);
+  const auth = useContext<AuthContextInterface>(AuthContext);
   const [placeToUpdate, setPlaceToUpdate] = useState<Place>();
   const { error, isLoading, sendRequest, clearError } = useHttpClient();
   const { placeId } = useParams<RouteParams>();
@@ -56,7 +54,7 @@ const UpdatePlace: React.FC = () => {
       try {
         const response = await sendRequest(
           "GET",
-          `http://localhost:5001/api/places/${placeId}`
+          `${process.env.REACT_APP_BACKEND_URL}/places/${placeId}`
         );
         const responseData = response.place;
         setPlaceToUpdate(responseData);
@@ -85,10 +83,13 @@ const UpdatePlace: React.FC = () => {
     try {
       await sendRequest(
         "PATCH",
-        `http://localhost:5001/api/places/${placeId}`,
+        `${process.env.REACT_APP_BACKEND_URL}/places/${placeId}`,
         {
           title: formState.inputs.title.value,
           description: formState.inputs.description.value,
+        },
+        {
+          Authorization: `Bearer ${auth.token}`,
         }
       );
       history.push(`/${auth.userId}/places`);

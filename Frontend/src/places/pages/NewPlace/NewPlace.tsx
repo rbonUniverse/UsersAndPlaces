@@ -15,10 +15,8 @@ import "./../PlaceFormCSS/PlaceForm.css";
 import ImageUpload from "../../../shared/components/FormElements/ImageUpload/ImageUpload";
 
 interface AuthContextInterface {
-  isLoggedIn: boolean;
+  token: boolean;
   userId: string;
-  login: (userId: string) => void;
-  logout: () => void;
 }
 
 interface FormDataInterface {
@@ -69,7 +67,14 @@ const NewPlace: React.FC = () => {
       formData.append("description", formState.inputs.description.value);
       formData.append("address", formState.inputs.address.value);
       formData.append("image", formState.inputs.image.value);
-      await sendRequest("POST", "http://localhost:5001/api/places", formData);
+      await sendRequest(
+        "POST",
+        `${process.env.REACT_APP_BACKEND_URL}/places`,
+        formData,
+        {
+          Authorization: `Bearer ${auth.token}`,
+        }
+      );
       history.push("/");
     } catch (error) {}
   };

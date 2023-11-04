@@ -24,7 +24,8 @@ export const useHttpClient = () => {
             title: string;
             description: string;
             address?: string;
-          }
+          },
+      token?: {}
     ) => {
       setIsLoading(true);
       const httpAbortCtrl = new AbortController();
@@ -33,16 +34,16 @@ export const useHttpClient = () => {
       let response;
       try {
         if (method === "POST") {
-          response = await axios.post(url, body);
+          response = await axios.post(url, body, token);
         }
         if (method === "GET") {
           response = await axios.get(url);
         }
         if (method === "PATCH") {
-          response = await axios.patch(url, body);
+          response = await axios.patch(url, body, token);
         }
         if (method === "DELETE") {
-          response = await axios.delete(url);
+          response = await axios.delete(url, token);
         }
 
         activeHttpRequests.current = activeHttpRequests.current.filter(

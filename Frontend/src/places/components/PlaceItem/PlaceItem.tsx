@@ -9,8 +9,13 @@ import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorMo
 import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 import "./PlaceItem.css";
 
+interface AuthContextInterface {
+  token: boolean;
+  userId: string;
+}
+
 interface PlaceItemProps {
-  userPlacesArray: {
+  item: {
     _id: string;
     creatorId: string;
     title: string;
@@ -18,19 +23,15 @@ interface PlaceItemProps {
     image: string;
     address: string;
     location: { lat: number; lng: number };
-  }[];
+  };
   onDeletePlace(_id: string): any;
 }
 
 const PlaceItem: React.FC<PlaceItemProps> = (props) => {
+  const auth = useContext<AuthContextInterface>(AuthContext);
   const [showMap, setShowMap] = useState<boolean>(false);
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  const auth = useContext(AuthContext);
-
-  const showButtonsToCreator = props.userPlacesArray.find(
-    (creator) => creator.creatorId === auth.userId
-  );
 
   const openMapHandler = () => {
     setShowMap(true);
@@ -49,83 +50,85 @@ const PlaceItem: React.FC<PlaceItemProps> = (props) => {
 
   const confirmDeleteHandler = async () => {
     setShowConfirmModal(false);
-    const place = props.userPlacesArray.find((pId) => pId._id);
-    const _id = place._id;
     try {
-      await sendRequest("DELETE", `http://localhost:5001/api/places/${_id}`);
-      props.onDeletePlace(_id);
+      await sendRequest(
+        "DELETE",
+        `${process.env.REACT_APP_BACKEND_URL}/places/${props.item._id}`,
+        {
+          Authorization: `Bearer ${auth.token}`,
+        } as {}
+      );
+      props.onDeletePlace(props.item._id);
     } catch (err: any) {}
   };
 
   return (
     <>
       <ErrorModal error={error && error.message} onClear={clearError} />
-      {props.userPlacesArray.map((item) => (
-        <div className="PlaceItem" key={item._id}>
-          <Modal
-            show={showMap}
-            onCancel={closeMapHandler}
-            header={item.address}
-            contentClass="place-item__modal-content"
-            footerClass="place-item__modal-actions"
-            footer={<Button onClick={closeMapHandler}>CLOSE</Button>}
-          >
-            <div className="map-container">
-              <Map center={item.location} zoom={16} />
+      <div className="PlaceItem" key={props.item._id}>
+        <Modal
+          show={showMap}
+          onCancel={closeMapHandler}
+          header={props.item.address}
+          contentClass="place-item__modal-content"
+          footerClass="place-item__modal-actions"
+          footer={<Button onClick={closeMapHandler}>CLOSE</Button>}
+        >
+          <div className="map-container">
+            <Map center={props.item.location} zoom={16} />
+          </div>
+        </Modal>
+        <Modal
+          show={showConfirmModal}
+          onCancel={cancelDeleteHandler}
+          header="Are you sure?"
+          footerClass="place-item__modal-actions"
+          footer={
+            <>
+              <Button inverse onClick={cancelDeleteHandler}>
+                CANCEL
+              </Button>
+              <Button danger onClick={confirmDeleteHandler}>
+                DELETE
+              </Button>
+            </>
+          }
+        >
+          <p>
+            Do you want to proceed and delete this place ? This action can not
+            be undone!!!
+          </p>
+        </Modal>
+        <li className="place-item">
+          <Card className="place-item__content">
+            {isLoading && <LoadingSpinner asOverlay />}
+            <div className="place-item__image">
+              <img
+                src={`${process.env.REACT_APP_ASSET_URL}/${props.item.image}`}
+                alt={props.item.title}
+              />
             </div>
-          </Modal>
-          <Modal
-            show={showConfirmModal}
-            onCancel={cancelDeleteHandler}
-            header="Are you sure?"
-            footerClass="place-item__modal-actions"
-            footer={
-              <>
-                <Button inverse onClick={cancelDeleteHandler}>
-                  CANCEL
-                </Button>
-                <Button danger onClick={confirmDeleteHandler}>
+            <div className="place-item__info">
+              <h2>{props.item.title}</h2>
+              <h3>{props.item.address}</h3>
+              <p>{props.item.description}</p>
+            </div>
+            <div className="place-item__actions">
+              <Button inverse onClick={openMapHandler}>
+                VIEW ON MAP
+              </Button>
+              {auth.userId === props.item.creatorId && (
+                <Button to={`/places/${props.item._id}`}>EDIT</Button>
+              )}
+              {auth.userId === props.item.creatorId && (
+                <Button danger onClick={showDeleteWarningHandler}>
                   DELETE
                 </Button>
-              </>
-            }
-          >
-            <p>
-              Do you want to proceed and delete this place ? This action can not
-              be undone!!!
-            </p>
-          </Modal>
-          <li className="place-item">
-            <Card className="place-item__content">
-              {isLoading && <LoadingSpinner asOverlay />}
-              <div className="place-item__image">
-                <img
-                  src={`http://localhost:5001/${item.image}`}
-                  alt={item.title}
-                />
-              </div>
-              <div className="place-item__info">
-                <h2>{item.title}</h2>
-                <h3>{item.address}</h3>
-                <p>{item.description}</p>
-              </div>
-              <div className="place-item__actions">
-                <Button inverse onClick={openMapHandler}>
-                  VIEW ON MAP
-                </Button>
-                {showButtonsToCreator && (
-                  <Button to={`/places/${item._id}`}>EDIT</Button>
-                )}
-                {showButtonsToCreator && (
-                  <Button danger onClick={showDeleteWarningHandler}>
-                    DELETE
-                  </Button>
-                )}
-              </div>
-            </Card>
-          </li>
-        </div>
-      ))}
+              )}
+            </div>
+          </Card>
+        </li>
+      </div>
     </>
   );
 };
