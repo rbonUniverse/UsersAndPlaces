@@ -1,17 +1,9 @@
 {
   "env": {
-<<<<<<< HEAD
-    "DB_USER": "YOUR NAME",
-    "DB_PASSWORD": "YOUR DB PASSWORD",
-    "DB_NAME": "DB Name",
-    "GOOGLE_API_KEY": "YOUR_GOOGLE_API",
-    "JWT_KEY": "YOUR SERCRET KEY"
-=======
     "DB_USER": "DB_USERNAME",
     "DB_PASSWORD": "DB_PASSWORD",
     "DB_NAME": "DB_NAME",
     "GOOGLE_API_KEY": "YOUR_GOOGLE_KEY",
-    "JWT_KEY": "JWT_SECRET_KEY"
->>>>>>> 1781a18 (Updated the Authorization and Authentication)
+    "JWT_KEY": "YOUR_SERCRET"
   }
 }

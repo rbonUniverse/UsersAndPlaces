@@ -15,6 +15,12 @@ interface PlaceFieldsInterface {
   image: Request;
 }
 
+declare module "express" {
+  interface Request {
+    userData: { userId: string };
+  }
+}
+
 // GET place by _id
 const getPlaceById = async (
   req: Request,
@@ -152,7 +158,7 @@ const updatePlace = async (req: Request, res: Response, next: NextFunction) => {
     const error = new HTTPError("You are not allowed to edit this place.", 401);
     return next(error);
   }
-  
+
   try {
     place = await PlaceModel.findByIdAndUpdate(
       placeId,

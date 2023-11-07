@@ -125,7 +125,7 @@ const UserAuth: React.FC<FormDataInterface> = () => {
             <LoadingSpinner asOverlay />
           </div>
         )}
-        <h2>Login Required</h2>
+        {isLoginMode ? <h2>Login Required</h2> : <h2>Signup Required</h2>}
         <hr />
         <form onSubmit={authLoginHandler}>
           {!isLoginMode && (

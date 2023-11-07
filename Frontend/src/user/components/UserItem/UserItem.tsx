@@ -5,7 +5,7 @@ import React from "react";
 import "./UserItem.css";
 
 interface ItemProps {
-    usersArray: {
+  usersArray: {
     _id: string;
     image: string;
     name: string;
@@ -13,7 +13,7 @@ interface ItemProps {
   }[];
 }
 
-const UserItem: React.FC<ItemProps> = (props) => {    
+const UserItem: React.FC<ItemProps> = (props) => {
   return (
     <div className="UserItem">
       {props.usersArray.map((user) => (
@@ -27,7 +27,9 @@ const UserItem: React.FC<ItemProps> = (props) => {
                 <h2>{user.name}</h2>
                 <h3>
                   {user.places?.length === 1 ? "Place " : "Places "}
-                  {(user.places === undefined || user.places.length === 0) ? 0 : user.places?.length}
+                  {user.places === undefined || user.places.length === 0
+                    ? 0
+                    : user.places?.length}
                 </h3>
               </div>
             </Link>
