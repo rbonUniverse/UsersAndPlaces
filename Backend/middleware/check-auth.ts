@@ -33,7 +33,7 @@ const checkAuth = (req: Request, _res: Response, next: NextFunction) => {
       next();
     } catch (err: any) {
       const error = new HTTPError("Authentication failed!", 401);
-      next(error);
+      return next(error);
     }
   }
 };
