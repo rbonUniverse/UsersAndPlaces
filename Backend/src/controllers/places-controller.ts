@@ -152,6 +152,7 @@ const updatePlace = async (req: Request, res: Response, next: NextFunction) => {
     const error = new HTTPError("You are not allowed to edit this place.", 401);
     return next(error);
   }
+  
   try {
     place = await PlaceModel.findByIdAndUpdate(
       placeId,

@@ -17,7 +17,7 @@ interface UserFieldsInterface {
 let token: string;
 
 // GET Places by user
-const getUsers = async (req: Request, res: Response, next: NextFunction) => {
+const getUsers = async (_req: Request, res: Response, next: NextFunction) => {
   let users: IUserModel[] | null;
   try {
     users = await UserModel.find({}, "-password");
