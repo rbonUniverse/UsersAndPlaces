@@ -54,8 +54,9 @@ const PlaceItem: React.FC<PlaceItemProps> = (props) => {
       await sendRequest(
         "DELETE",
         `${process.env.REACT_APP_BACKEND_URL}/places/${props.item._id}`,
+        null,
         {
-          Authorization: `Bearer ${auth.token}`,
+          headers: { Authorization: `Bearer ${auth.token}` },
         } as {}
       );
       props.onDeletePlace(props.item._id);

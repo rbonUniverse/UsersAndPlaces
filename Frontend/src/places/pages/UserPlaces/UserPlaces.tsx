@@ -19,7 +19,8 @@ const UserPlaces: React.FC = () => {
       try {
         const responseData = await sendRequest(
           "GET",
-          `${process.env.REACT_APP_BACKEND_URL}/places/user/${userId}`
+          `${process.env.REACT_APP_BACKEND_URL}/places/user/${userId}`,
+          null
         );
         setLoadedPlaces(responseData.places);
       } catch (err: any) {}

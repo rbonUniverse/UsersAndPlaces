@@ -54,7 +54,8 @@ const UpdatePlace: React.FC = () => {
       try {
         const response = await sendRequest(
           "GET",
-          `${process.env.REACT_APP_BACKEND_URL}/places/${placeId}`
+          `${process.env.REACT_APP_BACKEND_URL}/places/${placeId}`,
+          null
         );
         const responseData = response.place;
         setPlaceToUpdate(responseData);
@@ -89,7 +90,7 @@ const UpdatePlace: React.FC = () => {
           description: formState.inputs.description.value,
         },
         {
-          Authorization: `Bearer ${auth.token}`,
+          headers: { Authorization: `Bearer ${auth.token}` },
         }
       );
       history.push(`/${auth.userId}/places`);

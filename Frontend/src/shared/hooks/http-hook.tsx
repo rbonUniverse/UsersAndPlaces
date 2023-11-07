@@ -11,7 +11,7 @@ export const useHttpClient = () => {
     async (
       method: "GET" | "POST" | "PATCH" | "DELETE",
       url: string,
-      body?:
+      body:
         | {
             name?: string;
             email?: string;

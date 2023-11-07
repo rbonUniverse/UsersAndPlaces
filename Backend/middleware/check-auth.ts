@@ -14,28 +14,27 @@ declare global {
   }
 }
 
-const checkAuth = (req: Request, res: Response, next: NextFunction) => {
+const checkAuth = (req: Request, _res: Response, next: NextFunction) => {
   if (
     req.method === "POST" ||
     req.method === "PATCH" ||
     req.method === "DELETE"
   ) {
-    return next();
-  }
-  try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      throw new Error("Authentication failed!");
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) {
+        throw new Error("Authentication failed!");
+      }
+      const decodedToken = jwt.verify(
+        token,
+        process.env.JWT_KEY as string
+      ) as JwtPayload;
+      req.userData = { userId: decodedToken.userId };
+      next();
+    } catch (err: any) {
+      const error = new HTTPError("Authentication failed!", 401);
+      next(error);
     }
-    const decodedToken = jwt.verify(
-      token,
-      process.env.JWT_KEY as string
-    ) as JwtPayload;
-    req.userData = { userId: decodedToken.userId };
-    return next(req.userData);
-  } catch (err: any) {
-    const error = new HTTPError("Authentication failed!", 401);
-    next(error);
   }
 };
 

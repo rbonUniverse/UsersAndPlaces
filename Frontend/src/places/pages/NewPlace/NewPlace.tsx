@@ -72,7 +72,7 @@ const NewPlace: React.FC = () => {
         `${process.env.REACT_APP_BACKEND_URL}/places`,
         formData,
         {
-          Authorization: `Bearer ${auth.token}`,
+          headers: { Authorization: `Bearer ${auth.token}` },
         }
       );
       history.push("/");
