@@ -9,7 +9,7 @@ interface AppInterface {
   userId: string;
 }
 
-const  useAuth = (): AppInterface => {
+const useAuth = (): AppInterface => {
   const [token, setToken] = useState<boolean>(false);
   const [tokenExpirationDate, setTokenExpirationDate] = useState<Date | null>();
   const [userId, setUserId] = useState<string | null>(null);
@@ -65,6 +65,6 @@ const  useAuth = (): AppInterface => {
     }
   }, [login]);
   return { token, login, logout, userId };
-}
+};
 
 export default useAuth;

@@ -11,8 +11,8 @@ import { useForm } from "../../../shared/hooks/form-hook";
 import AuthContext from "../../../shared/components/context/auth-context";
 import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
 import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
-import "./../PlaceFormCSS/PlaceForm.css";
 import ImageUpload from "../../../shared/components/FormElements/ImageUpload/ImageUpload";
+import "./../PlaceFormCSS/PlaceForm.css";
 
 interface AuthContextInterface {
   token: boolean;
@@ -84,6 +84,8 @@ const NewPlace: React.FC = () => {
       <ErrorModal error={error && error.message} onClear={clearError} />
       {isLoading && <LoadingSpinner asOverlay />}
       <form className="place-form" onSubmit={placeSubmitHandler}>
+      <h2>Add New Place</h2>
+      <hr />
         <Input
           _id="title"
           element="input"
@@ -101,19 +103,19 @@ const NewPlace: React.FC = () => {
           errorText="Please enter a valid description (at least 5 characters)."
           onInput={inputHandler}
         />
+          <ImageUpload
+            _id="image"
+            center
+            error
+            errorText="Please provide an image"
+            onInput={inputHandler}
+          />
         <Input
           _id="address"
           element="input"
           label="Address"
           validators={[VALIDATOR_REQUIRE()]}
           errorText="Please enter a valid address."
-          onInput={inputHandler}
-        />
-        <ImageUpload
-          _id="image"
-          center
-          error
-          errorText="Please provide an image"
           onInput={inputHandler}
         />
         <Button type="submit" disabled={!formState.isValid}>

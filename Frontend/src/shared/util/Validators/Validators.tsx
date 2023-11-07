@@ -1,23 +1,29 @@
-const VALIDATOR_TYPE_REQUIRE = 'REQUIRE';
-const VALIDATOR_TYPE_MINLENGTH = 'MINLENGTH';
-const VALIDATOR_TYPE_MAXLENGTH = 'MAXLENGTH';
-const VALIDATOR_TYPE_MIN = 'MIN';
-const VALIDATOR_TYPE_MAX = 'MAX';
-const VALIDATOR_TYPE_EMAIL = 'EMAIL';
-const VALIDATOR_TYPE_FILE = 'FILE';
+const VALIDATOR_TYPE_REQUIRE = "REQUIRE";
+const VALIDATOR_TYPE_MINLENGTH = "MINLENGTH";
+const VALIDATOR_TYPE_MAXLENGTH = "MAXLENGTH";
+const VALIDATOR_TYPE_MIN = "MIN";
+const VALIDATOR_TYPE_MAX = "MAX";
+const VALIDATOR_TYPE_EMAIL = "EMAIL";
+const VALIDATOR_TYPE_FILE = "FILE";
 
 export const VALIDATOR_REQUIRE = () => ({ type: VALIDATOR_TYPE_REQUIRE });
 export const VALIDATOR_FILE = () => ({ type: VALIDATOR_TYPE_FILE });
 export const VALIDATOR_MINLENGTH = (val: any) => ({
   type: VALIDATOR_TYPE_MINLENGTH,
-  val: val
+  val: val,
 });
 export const VALIDATOR_MAXLENGTH = (val: any) => ({
   type: VALIDATOR_TYPE_MAXLENGTH,
-  val: val
+  val: val,
 });
-export const VALIDATOR_MIN = (val: any) => ({ type: VALIDATOR_TYPE_MIN, val: val });
-export const VALIDATOR_MAX = (val: any) => ({ type: VALIDATOR_TYPE_MAX, val: val });
+export const VALIDATOR_MIN = (val: any) => ({
+  type: VALIDATOR_TYPE_MIN,
+  val: val,
+});
+export const VALIDATOR_MAX = (val: any) => ({
+  type: VALIDATOR_TYPE_MAX,
+  val: val,
+});
 export const VALIDATOR_EMAIL = () => ({ type: VALIDATOR_TYPE_EMAIL });
 
 export const validate = (value: any, validators: any) => {
